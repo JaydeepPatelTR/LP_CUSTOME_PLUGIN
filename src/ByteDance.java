@@ -1,9 +1,6 @@
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,11 +19,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
 
 public class ByteDance {
 
@@ -47,13 +39,12 @@ public class ByteDance {
 	public static String ACTION_URL ="https://bytedance.com";
 	public static String BUTTON_URL ="https://us.legaltracker.thomsonreuters.com/";
 	public static String BUTTON_TEXT ="Legal Tracker";
-	
 	public static void main(String[] args) throws Exception {
 		try {
 			String filePath = "C:\\home\\Pending_invoice_list_for_approval.xlsx";
 
 			File file = new File(filePath);
-			InputStream inputfStream = getFileFromSFTP("gcc-uat.hostedtax.thomsonreuters.com","ofv-uat.gcc-uat","m1j3hJQJmHuNagm","/input/Pending_invoice_list_for_approval.xlsx");
+			FileInputStream inputfStream = new FileInputStream(file);
 
 			Map paramsValue = new HashMap();
 			paramsValue.put("app_id", APP_ID);
@@ -79,21 +70,7 @@ public class ByteDance {
 		}
 	}
 
-	public static InputStream getFileFromSFTP(String sftpHost, String sftpUsername, String sftpPassword, String sftpFileLocation) throws JSchException, SftpException {
-	    JSch jsch = new JSch();
-	    Session jschSession = jsch.getSession(sftpUsername, sftpHost, 2222);
-	    jschSession.setPassword(sftpPassword);
-	    jschSession.setConfig("StrictHostKeyChecking", "No");
-	    jschSession.connect();
-	    ChannelSftp sftp = (ChannelSftp) jschSession.openChannel("sftp");
-	    sftp.connect();
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    sftp.get(sftpFileLocation, baos);
-	    sftp.exit();
-	    return new ByteArrayInputStream(baos.toByteArray());
-	}
-	
-	public static String invokeApi(Map<String, String> params,InputStream inputfStream) throws IOException {
+	public static String invokeApi(Map<String, String> params,FileInputStream inputfStream) throws IOException {
 
 		String Result = "";
 		try {
@@ -274,9 +251,9 @@ public class ByteDance {
 			
 			ObjectMapper messageMapper = new ObjectMapper();
          
-			//Result = callApi(urlPre,
-			// null,APP_ACCESS_TOKEN,"",messageMapper.writeValueAsString(messageBean));
-			System.out.println(invoiceMessage);
+			Result = callApi(urlPre,
+			 null,APP_ACCESS_TOKEN,"",messageMapper.writeValueAsString(messageBean));
+			System.out.println(Result);
 			Result = "Message sent successfully.";
 		} catch (Exception e) {
 			Result = "Error in SendMessage API.";

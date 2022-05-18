@@ -25,6 +25,5 @@
 	<classpathentry kind="lib" path="etc/poi-scratchpad-4.1.1.jar"/>
 	<classpathentry kind="lib" path="etc/SparseBitSet-1.2.jar"/>
 	<classpathentry kind="lib" path="etc/xmlbeans-3.1.0.jar"/>
-	<classpathentry kind="lib" path="etc/jsch-0.1.55.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
