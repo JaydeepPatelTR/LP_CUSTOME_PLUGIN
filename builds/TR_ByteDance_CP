@@ -1,0 +1,53 @@
+
+import com.adeptia.ByteDance;
+import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import com.adeptia.indigo.services.ServiceException;
+
+
+    	
+	try{
+		  
+			String API_URL = "https://open.feishu.cn/open-apis/auth/v3/app_access_token/internal";
+			String API_URL_USERID = "https://open.feishu.cn/open-apis/contact/v3/users/batch_get_id?user_id_type=open_id";
+			String API_URL_MESSAGE = "https://www.feishu.cn/approval/openapi/v1/message/send";
+
+            String APP_ID = "cli_a2b855b1933a500c";
+			String API_SEC = "imCXH707q2BSB6aY1MvnvhyZ415ecWvz";
+			String USER_EMAIL = "philip.wang@bytedance.com";
+			String MESSAGE_TITLE = "Legal Tracker Pending Invoice ";
+		    String MESSAGE_DISCLAIMER = "An invoice is awaiting your review, please log into the Legal Tracker system and navigate to Financial/Invoice Review to see invoice(s) currently awaiting your review."; 
+	        String MESSAGE_DISCLAIMER_2 = "Please click on the link below to navigate to Legal Tracker.";	
+	
+	        String ACTION_URL ="https://bytedance.com";
+			String BUTTON_URL ="https://us.legaltracker.thomsonreuters.com/";
+			String BUTTON_TEXT ="Legal Tracker";
+			
+			String filePath = "C:\\Users\\AKumar\\Desktop\\source\\Pending_invoice_list_for_approval.xlsx";
+		    File file = new File(filePath);
+			FileInputStream inputfStream = new FileInputStream(file);
+					
+			Map paramsValue=new HashMap();
+			paramsValue.put("app_id", APP_ID);
+			paramsValue.put("app_secret", API_SEC);
+		
+			paramsValue.put("filePath", filePath);
+			paramsValue.put("api_url", API_URL);
+			paramsValue.put("api_url_userid", API_URL_USERID);
+			paramsValue.put("api_url_message", API_URL_MESSAGE);
+			paramsValue.put("message_title", MESSAGE_TITLE);
+			paramsValue.put("user_email", USER_EMAIL);
+			paramsValue.put("message_disclaimer", MESSAGE_DISCLAIMER);
+			paramsValue.put("message_disclaimer_2", MESSAGE_DISCLAIMER_2);
+			paramsValue.put("button_url", BUTTON_URL);
+			paramsValue.put("action_url", ACTION_URL);
+			paramsValue.put("button_text", BUTTON_TEXT);
+		    String result = ByteDance.invokeApi(paramsValue,inputfStream);
+		
+		}catch(Exception e){
+			context.put("ErrorTrace",e.getMessage());
+			throw new ServiceException(e);
+		}

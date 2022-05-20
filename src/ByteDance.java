@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,8 +129,9 @@ public class ByteDance {
 						}  else if(j == 2) {						
 							  cellContents = String.valueOf((int) cell.getNumericCellValue());
 						}
-						else {								
-							  cellContents = String.valueOf(cell.getNumericCellValue());
+						else {		
+							BigDecimal bd = new BigDecimal(cell.getNumericCellValue()).setScale(2, RoundingMode.HALF_UP);
+							  cellContents = String.valueOf(bd);
 						}
 					 }
 				  }
