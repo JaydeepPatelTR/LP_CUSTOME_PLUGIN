@@ -8,17 +8,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -35,15 +38,17 @@ public class ByteDance {
 	public static String API_SEC = "imCXH707q2BSB6aY1MvnvhyZ415ecWvz";
 	public static String USER_EMAIL = "philip.wang@bytedance.com";
 	public static String MESSAGE_TITLE = "Legal Tracker Pending Invoice ";
-	public static String MESSAGE_DISCLAIMER = "An invoice is awaiting your review, please log into the Legal Tracker system and navigate to Financial/Invoice Review to see invoice(s) currently awaiting your review."; 
-	public static String MESSAGE_DISCLAIMER_2 = "Please click on the link below to navigate to Legal Tracker.";	
-	
-	public static String ACTION_URL ="https://bytedance.com";
-	public static String BUTTON_URL ="https://us.legaltracker.thomsonreuters.com/";
-	public static String BUTTON_TEXT ="Legal Tracker";
+	public static String MESSAGE_DISCLAIMER = "An invoice is awaiting your review, please log into the Legal Tracker system and navigate to Financial/Invoice Review to see invoice(s) currently awaiting your review.";
+	public static String MESSAGE_DISCLAIMER_2 = "Please click on the link below to navigate to Legal Tracker.";
+
+	public static String ACTION_URL = "https://bytedance.com";
+	public static String BUTTON_URL = "https://us.legaltracker.thomsonreuters.com/";
+	public static String BUTTON_TEXT = "Legal Tracker";
+	public static String CONST = "'";
+
 	public static void main(String[] args) throws Exception {
 		try {
-			String filePath = "C:\\home\\Pending_invoice_list_for_approval.xlsx";
+			String filePath = "C:\\home\\Pending_invoice_list_for_approval_010063102070165484425596693294.xls";
 
 			File file = new File(filePath);
 			FileInputStream inputfStream = new FileInputStream(file);
@@ -64,7 +69,7 @@ public class ByteDance {
 			paramsValue.put("button_url", BUTTON_URL);
 			paramsValue.put("action_url", ACTION_URL);
 			paramsValue.put("button_text", BUTTON_TEXT);
-			String apiResponse = invokeApi(paramsValue,inputfStream);// simulation();
+			String apiResponse = invokeApi(paramsValue, inputfStream);// simulation();
 			System.out.println(apiResponse);
 
 		} catch (Exception e) {
@@ -72,85 +77,100 @@ public class ByteDance {
 		}
 	}
 
-	public static String invokeApi(Map<String, String> params,FileInputStream inputfStream) throws IOException {
+	public static String invokeApi(Map<String, String> params, FileInputStream inputfStream) throws IOException {
 
 		String Result = "";
 		try {
-			SimpleDateFormat dtformatter = new SimpleDateFormat("dd MMMM yyyy");  
+
+			SimpleDateFormat dtformatter_convert = new SimpleDateFormat("MM/dd/yyyy");
+			SimpleDateFormat dateformattter = new SimpleDateFormat("dd MMMM yyyy");
 			System.out.println("Started Reading Excel Details.");
-			XSSFWorkbook excelWorkbook = new XSSFWorkbook(inputfStream);
-			
-			XSSFSheet excelSheet = excelWorkbook.getSheetAt(0);
-			
-			int rows = excelSheet.getPhysicalNumberOfRows();// 3
-			
-			int cols = excelSheet.getRow(0).getPhysicalNumberOfCells();// 2
-			
-			String[] invoiceContent = new String[rows-1];
-			XSSFCell cell;
-			DataFormatter formatter = new DataFormatter(); // creating formatter using the default locale
+			// XSSFWorkbook excelWorkbook = new XSSFWorkbook(inputfStream);
+			org.apache.poi.ss.usermodel.Workbook workbook = WorkbookFactory.create(inputfStream);
+
+			// XSSFSheet excelSheet = excelWorkbook.getSheetAt(0);
+			org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
+			int rows = sheet.getPhysicalNumberOfRows();// 3
+
+			int cols = sheet.getRow(0).getPhysicalNumberOfCells();// 2
+
+			String[][] invoiceContent = new String[rows - 1][2];
+			HashSet<String> InvoiceEmails = new HashSet<String>();
+
+			Cell cell;
+	
 
 			for (int i = 1; i < rows; i++) {
-				StringBuilder contentData=new StringBuilder();  
-				
+				StringBuilder contentData = new StringBuilder();
+				String ApprovalEmail = "";
 				for (int j = 0; j < cols; j++) {
 					String cellTitle = "";
 					String cellContents = "";
-					
-					cell = excelSheet.getRow(i).getCell(j);	
-					// For cell title
-					if (j == 0) {
-						cellTitle="Vendor Name: ";
-					}
-					else if(j == 1) {
-						  cellTitle="Invoice Date: ";
-					}
-					else if(j == 2) {
-						  cellTitle="Invoice Number: ";
-					}
-					else if(j == 3) {
-						cellTitle="Matter Name: ";
-					}
-					else if(j == 4) {
-						cellTitle="Invoice Currency: ";
-					}
-					else	if(j == 5) {
-						cellTitle="Invoice Amount: ";
-					}
-					// For check cell value null or not
-					if(cell != null) {
-																				
-					if (cell.getCellType() == CellType.STRING) {						
-						cellContents = cell.getStringCellValue();
-					} else if (cell.getCellType() == CellType.NUMERIC) {
-						if (j == 1) {	
-						  cellContents= dtformatter.format(cell.getDateCellValue());  
-							
-						}  else if(j == 2) {						
-							  cellContents = String.valueOf((int) cell.getNumericCellValue());
+					if (j == 0 || j == 1 || j == 6 || j == 3 || j == 4 || j == 5 || j == 8) {
+
+						cell = sheet.getRow(i).getCell(j);
+						// For cell title
+						if (j == 0) {
+							cellTitle = "Vendor Name: ";
+						} else if (j == 1) {
+							cellTitle = "Invoice Date: ";
+						} else if (j == 3) {
+							cellTitle = "Invoice Number: ";
+						} else if (j == 4) {
+							cellTitle = "Matter Name: ";
+						} else if (j == 5) {
+							cellTitle = "Invoice Currency: ";
+						} else if (j == 6) {
+							cellTitle = "Invoice Amount: ";
 						}
-						else {		
-							BigDecimal bd = new BigDecimal(cell.getNumericCellValue()).setScale(2, RoundingMode.HALF_UP);
-							  cellContents = String.valueOf(bd);
+						// For check cell value null or not
+						if (cell != null) {
+
+							if (cell.getCellType() == CellType.STRING) {
+								if (j == 1) {
+									cellContents = dateformattter
+											.format(dtformatter_convert.parse(cell.getStringCellValue()));
+								} else if (j == 8) {
+									ApprovalEmail = cell.getStringCellValue().trim();
+									InvoiceEmails.add(ApprovalEmail);
+
+								} else {
+									cellContents = cell.getStringCellValue();
+								}
+							} else if (cell.getCellType() == CellType.NUMERIC) {
+								if (j == 6) {
+									BigDecimal bd = new BigDecimal(cell.getNumericCellValue()).setScale(2,
+											RoundingMode.HALF_UP);
+									cellContents = String.valueOf(bd);
+								} else {
+									cellContents = String.valueOf((int) cell.getNumericCellValue());
+								}
+							}
+						} else if (j == 8) {
+							ApprovalEmail = "";
 						}
-					 }
-				  }
-					
-					contentData.append(cellTitle + cellContents);	
-					if(j == 5) {
-						contentData.append("\r\n\r\n" + params.get("message_disclaimer")  + "\r\n\r\n" + params.get("message_disclaimer_2") +"\r\n");				
-					}				
-					else
-					{
-						contentData.append("\r\n");	
+
+						if (j != 8) {
+							contentData.append(cellTitle + cellContents);
+							if (j == 6) {
+								contentData.append("\r\n\r\n" + params.get("message_disclaimer") + "\r\n\r\n"
+										+ params.get("message_disclaimer_2") + "\r\n");
+							} else {
+								contentData.append("\r\n");
+							}
+						}
 					}
 				}
-				invoiceContent[i-1] = contentData.toString();
+				if (ApprovalEmail != "") {
+					invoiceContent[i - 1][0] = contentData.toString();
+					invoiceContent[i - 1][1] = ApprovalEmail;
+				}
 			}
 			System.out.println("Completed Reading Excel Details.");
-			excelWorkbook.close();
+
+			workbook.close();
 			inputfStream.close();
-		
+
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
 			nameValuePairs.add(new BasicNameValuePair("app_id", params.get("app_id")));
@@ -163,8 +183,8 @@ public class ByteDance {
 
 			if (isNotEmpty(APP_ACCESS_TOKEN)) {
 				System.out.println("Token :" + APP_ACCESS_TOKEN);
-				 Result = getUserID(params.get("api_url_userid"), params.get("user_email"),
-				 APP_ACCESS_TOKEN,params,invoiceContent);
+				Result = getUserID(params.get("api_url_userid"), InvoiceEmails, APP_ACCESS_TOKEN, params,
+						invoiceContent);
 			} else {
 				System.out.println("Error in get access Token.");
 				Result = "Error in get access Token.";
@@ -179,31 +199,40 @@ public class ByteDance {
 		return Result;
 	}
 
-	private static String getUserID(String urlPre, String Email, String Token, Map<String, String> params,
-			String[] invoiceContent) throws IOException {
+	private static String getUserID(String urlPre, HashSet<String> InvoiceEmails, String Token,
+			Map<String, String> params, String[][] invoiceContent) throws IOException {
 
 		String Result = "";
 		try {
-			String UserID = null;
+
+			String[] InvoiceEmailArray = InvoiceEmails.toArray(new String[InvoiceEmails.size()]);
+
 			EmailBean emailBean = new EmailBean();
-			emailBean.setEmails(Arrays.asList(Email));
+			emailBean.setEmails(Arrays.asList(InvoiceEmailArray));
 
 			ObjectMapper emailMapper = new ObjectMapper();
 
 			response = callApi(urlPre, null, Token, emailMapper.writeValueAsString(emailBean), null);
+			System.out.println("Get UserID Response:" + response);
 
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode node = mapper.readTree(response);
 			if (node.get("data").get("user_list") != null) {
-				UserID = node.get("data").get("user_list").get(0).get("user_id").asText();
-			}
 
-			if (UserID != null) {
-				System.out.println("Get UserID Response:" + response);
-				for (String invoiceMessage : invoiceContent) {
-					Result = sendMessage(params.get("api_url_message"), UserID, Token, params,invoiceMessage);
+				for (String[] invoiceMessage : invoiceContent) {
+					if (invoiceMessage[0] != null) {
+						for (JsonNode jsonNodes : node.get("data").get("user_list")) {
+							if (invoiceMessage[1].equals(jsonNodes.get("email").asText())
+									&& jsonNodes.get("user_id") != null) {
+								System.out.println(invoiceMessage[1] + "-" + jsonNodes.get("email").asText());
+
+								Result = sendMessage(params.get("api_url_message"), jsonNodes.get("user_id").asText(),
+										Token, params, invoiceMessage[0]);
+								break;
+							}
+						}
+					}
 				}
-			
 			} else {
 				System.out.println("Error in getting UserID.");
 				Result = "Error in getting UserID.";
@@ -230,17 +259,17 @@ public class ByteDance {
 			texts.setI18n1(params.get("message_title"));
 			texts.setI18n2(invoiceMessage);
 			texts.setI18n3(params.get("button_text"));
-			
+
 			ActionsBean actionsBean = new ActionsBean();
 			actionsBean.setAction_name("@i18n@3");
 			actionsBean.setUrl(params.get("button_url"));
 			actionsBean.setAndroid_url(params.get("action_url"));
 			actionsBean.setIos_url(params.get("action_url"));
 			actionsBean.setPc_url(params.get("action_url"));
-			
+
 			ActionsBean objaction[] = new ActionsBean[1];
 			objaction[0] = actionsBean;
-			
+
 			I18nResourcesBean newi18nResourcesBean = new I18nResourcesBean();
 			newi18nResourcesBean.setIs_default(true);
 			newi18nResourcesBean.setLocale("en_us");
@@ -248,15 +277,15 @@ public class ByteDance {
 
 			I18nResourcesBean obj[] = new I18nResourcesBean[1];
 			obj[0] = newi18nResourcesBean;
-			
+
 			messageBean.setActions(objaction);
 			messageBean.setI18n_resources(obj);
-			
+
 			ObjectMapper messageMapper = new ObjectMapper();
-         
-			Result = callApi(urlPre,
+
+			 Result = callApi(urlPre,
 			 null,APP_ACCESS_TOKEN,"",messageMapper.writeValueAsString(messageBean));
-			System.out.println(Result);
+			System.out.println(userID + " - " + invoiceMessage);
 			Result = "Message sent successfully.";
 		} catch (Exception e) {
 			Result = "Error in SendMessage API.";
@@ -291,4 +320,5 @@ public class ByteDance {
 		}
 		return false;
 	}
+
 }

@@ -17,7 +17,6 @@ import com.adeptia.indigo.services.ServiceException;
 
             String APP_ID = "cli_a2b855b1933a500c";
 			String API_SEC = "imCXH707q2BSB6aY1MvnvhyZ415ecWvz";
-			String USER_EMAIL = "philip.wang@bytedance.com";
 			String MESSAGE_TITLE = "Legal Tracker Pending Invoice ";
 		    String MESSAGE_DISCLAIMER = "An invoice is awaiting your review, please log into the Legal Tracker system and navigate to Financial/Invoice Review to see invoice(s) currently awaiting your review."; 
 	        String MESSAGE_DISCLAIMER_2 = "Please click on the link below to navigate to Legal Tracker.";	
@@ -34,12 +33,11 @@ import com.adeptia.indigo.services.ServiceException;
 			paramsValue.put("app_id", APP_ID);
 			paramsValue.put("app_secret", API_SEC);
 		
-			paramsValue.put("filePath", filePath);
+
 			paramsValue.put("api_url", API_URL);
 			paramsValue.put("api_url_userid", API_URL_USERID);
 			paramsValue.put("api_url_message", API_URL_MESSAGE);
 			paramsValue.put("message_title", MESSAGE_TITLE);
-			paramsValue.put("user_email", USER_EMAIL);
 			paramsValue.put("message_disclaimer", MESSAGE_DISCLAIMER);
 			paramsValue.put("message_disclaimer_2", MESSAGE_DISCLAIMER_2);
 			paramsValue.put("button_url", BUTTON_URL);
