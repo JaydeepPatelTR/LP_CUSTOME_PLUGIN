@@ -21,7 +21,7 @@ import com.adeptia.indigo.services.ServiceException;
 		    String MESSAGE_DISCLAIMER = "An invoice is awaiting your review, please log into the Legal Tracker system and navigate to Financial/Invoice Review to see invoice(s) currently awaiting your review."; 
 	        String MESSAGE_DISCLAIMER_2 = "Please click on the link below to navigate to Legal Tracker.";	
 	
-	        String ACTION_URL ="https://bytedance.com";
+	        String ACTION_URL ="https://us.legaltracker.thomsonreuters.com/";
 			String BUTTON_URL ="https://us.legaltracker.thomsonreuters.com/";
 			String BUTTON_TEXT ="Legal Tracker";
 			

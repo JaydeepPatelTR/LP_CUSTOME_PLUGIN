@@ -44,7 +44,7 @@ public class ByteDance {
 	public static String ACTION_URL = "https://bytedance.com";
 	public static String BUTTON_URL = "https://us.legaltracker.thomsonreuters.com/";
 	public static String BUTTON_TEXT = "Legal Tracker";
-	public static String CONST = "'";
+
 
 	public static void main(String[] args) throws Exception {
 		try {
@@ -63,7 +63,7 @@ public class ByteDance {
 			paramsValue.put("api_url_userid", API_URL_USERID);
 			paramsValue.put("api_url_message", API_URL_MESSAGE);
 			paramsValue.put("message_title", MESSAGE_TITLE);
-			paramsValue.put("user_email", USER_EMAIL);
+	
 			paramsValue.put("message_disclaimer", MESSAGE_DISCLAIMER);
 			paramsValue.put("message_disclaimer_2", MESSAGE_DISCLAIMER_2);
 			paramsValue.put("button_url", BUTTON_URL);
@@ -224,7 +224,7 @@ public class ByteDance {
 						for (JsonNode jsonNodes : node.get("data").get("user_list")) {
 							if (invoiceMessage[1].equals(jsonNodes.get("email").asText())
 									&& jsonNodes.get("user_id") != null) {
-								System.out.println(invoiceMessage[1] + "-" + jsonNodes.get("email").asText());
+								System.out.println(invoiceMessage[1] + " - " + jsonNodes.get("email").asText() + " - "+ jsonNodes.get("user_id").asText());
 
 								Result = sendMessage(params.get("api_url_message"), jsonNodes.get("user_id").asText(),
 										Token, params, invoiceMessage[0]);
@@ -285,7 +285,7 @@ public class ByteDance {
 
 			 Result = callApi(urlPre,
 			 null,APP_ACCESS_TOKEN,"",messageMapper.writeValueAsString(messageBean));
-			System.out.println(userID + " - " + invoiceMessage);
+			System.out.println(Result);
 			Result = "Message sent successfully.";
 		} catch (Exception e) {
 			Result = "Error in SendMessage API.";
